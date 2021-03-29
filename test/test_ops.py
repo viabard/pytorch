@@ -113,8 +113,7 @@ class TestGradients(TestCase):
                 variant_out_fn = variant
 
             def fn(*inputs):
-                output = variant_out_fn(*inputs, **sample.kwargs)
-                return op.output_func(output)
+                return op.gradcheck_wrapper(variant_out_fn, *inputs, **sample.kwargs)
 
             if check == 'gradcheck':
                 self.assertTrue(gradcheck(fn, (sample.input,) + sample.args,
@@ -309,7 +308,7 @@ class TestCommon(JitCommonTestCase):
                     check_against_reference(self,
                                             script_fn,
                                             func,
-                                            op.output_func,
+                                            lambda x: x,
                                             (sample.input,) + sample.args,
                                             sample.kwargs,
                                             no_grad=not _requires_grad)
@@ -319,7 +318,7 @@ class TestCommon(JitCommonTestCase):
                     check_against_reference(self,
                                             traced_fn,
                                             func,
-                                            op.output_func,
+                                            lambda x: x,
                                             (sample.input,) + sample.args,
                                             sample.kwargs,
                                             no_grad=not _requires_grad)
